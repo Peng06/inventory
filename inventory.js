@@ -2,6 +2,38 @@ var type = "drop";
 var disabled = false;
 var disabledFunction = null;
 
+document.getElementById("attachments").addEventListener("click", function() {
+    // Send a message to the server to request the second inventory
+    $.post("http://vrp_inventoryhud/request_second_inventory", JSON.stringify({
+        label: "attachments"
+    }));
+
+    // Send a message to the server to request the weapon attachments information
+    $.post("http://vrp_inventoryhud/RequestAttachmentInfo", JSON.stringify({
+        weapon: currentWeapon
+    }));
+
+    // Receive the weapon attachments information from the server
+    window.addEventListener("message", function (event) {
+        if (event.data.action == "setWeaponAttachments") {
+            // Set the weapon attachments information
+            var attachments = event.data.attachments;
+
+            // Clear the existing attachments boxes
+            document.getElementById("attachments").innerHTML = "";
+
+            // Create the attachment boxes based on the number of attachments for the current weapon
+            for (var i = 0; i < attachments.length; i++) {
+                var attachment = attachments[i];
+                var attachmentBox = document.createElement("div");
+                attachmentBox.className = "attachment";
+                attachmentBox.innerHTML = attachment.type;
+                document.getElementById("attachments").appendChild(attachmentBox);
+            }
+        }
+    });
+});
+
 window.addEventListener("message", function (event) {
     if (event.data.action == "display") {
         type = event.data.type;
@@ -22,7 +54,6 @@ window.addEventListener("message", function (event) {
     } else if (event.data.action == "notify") {
         notify(event.data.item, event.data.text)
     }
-
     $('.item').draggable({
         helper: 'clone',
         appendTo: ".inventory",
