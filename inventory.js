@@ -2,42 +2,6 @@ var type = "drop";
 var disabled = false;
 var disabledFunction = null;
 
-var attachmentsInventory = document.getElementById("attachments-inventory");
-
-window.addEventListener("dragover", function(event) {
-  event.preventDefault();
-});
-
-window.addEventListener("drop", function(event) {
-  event.preventDefault();
-  var weapon = event.dataTransfer.getData("text");
-
-  // Send a message to the server to request the weapon attachments information
-  $.post("http://vrp_inventoryhud/RequestAttachmentInfo", JSON.stringify({
-    weapon: weapon
-  }));
-
-  // Receive the weapon attachments information from the server
-  window.addEventListener("message", function (event) {
-    if (event.data.action == "setWeaponAttachments") {
-      // Set the weapon attachments information
-      var attachments = event.data.attachments;
-
-      // Clear the existing attachments boxes
-      attachmentsInventory.innerHTML = "";
-
-      // Create the attachment boxes based on the number of attachments for the current weapon
-      for (var i = 0; i < attachments.length; i++) {
-        var attachment = attachments[i];
-        var attachmentBox = document.createElement("div");
-        attachmentBox.className = "attachment";
-        attachmentBox.innerHTML = attachment.type;
-        attachmentsInventory.appendChild(attachmentBox);
-      }
-    }
-  });
-});
-
 window.addEventListener("message", function (event) {
     if (event.data.action == "display") {
         type = event.data.type;
@@ -240,6 +204,8 @@ function secondInventorySetup(items, weight, maxWeight, label) {
         $('#itemOther-' + index).data('inventory', "second");
     });
 }
+
+
 
 function Interval(time) {
     var timer = false;
